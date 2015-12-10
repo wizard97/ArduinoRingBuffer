@@ -1,6 +1,6 @@
 /*
-  RingBuf.h - Library for implimenting a Ring Buffer.
-  Created by Aaron Wisner, November 23, 2015.
+  RingBuf.h - Library for implementing a simple Ring Buffer on Arduino boards. 
+  Created by D. Aaron Wisner, December 10, 2015.
   Released into the public domain.
 */
 #ifndef RingBuf_h
@@ -29,7 +29,7 @@ typedef struct RingBuf
   bool (*isEmpty) (RingBuf*);
   // Add Event, Returns index where added in buffer, -1 on full buffer
   int (*add) (RingBuf*, void*);
-  // Returns pointer to element, NULL on empty buffer
+  // Returns pointer to nth element, NULL when nth element is empty
   void *(*peek) (RingBuf*, unsigned int);
   // Removes element and copies it to location pointed to by void *
   // Returns pointer passed in, NULL on empty buffer

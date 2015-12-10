@@ -1,3 +1,8 @@
+/*
+  RingBuf.c - Library for implementing a simple Ring Buffer on Arduino boards. 
+  Created by D. Aaron Wisner, December 10, 2015.
+  Released into the public domain.
+*/
 #include "RingBuf.h"
 #include <string.h>
 
