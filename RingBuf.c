@@ -42,7 +42,7 @@ int RingBuf_init(RingBuf *self, int size, int len)
   self->pull = &RingBufPull;
   return 0;
 }
-
+/////// Deconstructor //////////
 int RingBuf_delete(RingBuf *self)
 {
   free(self->buf);
