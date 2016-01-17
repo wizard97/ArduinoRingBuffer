@@ -15,13 +15,13 @@ A ring buffer is used when passing asynchronous io between two threads. In the c
 
 
 ### Constructor
-RingBuf* RingBuf_new(int size, int len);`
+`RingBuf* RingBuf_new(int size, int len);`
 
 Creates a new RingBuf object of len elements that are size bytes each. A poetinter to the new RingBuf object is returned on success. On failure (lack of memory), a null pointer is returned.
 This would be the equivalent of `new RingBuf(int size, int len)` in C++.
 
 ### Deconstructor
 
-int RingBuf_delete(RingBuf *self);
+`int RingBuf_delete(RingBuf *self);
 
 Deletes the RingBuf, and frees up all the memory associated with it.
