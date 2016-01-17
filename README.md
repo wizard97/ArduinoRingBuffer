@@ -22,6 +22,6 @@ This would be the equivalent of `new RingBuf(int size, int len)` in C++.
 
 ### Deconstructor
 
-`int RingBuf_delete(RingBuf *self);
+`int RingBuf_delete(RingBuf *self);`
 
 Deletes the RingBuf, and frees up all the memory associated with it.
