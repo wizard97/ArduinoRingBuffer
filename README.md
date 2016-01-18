@@ -3,9 +3,9 @@
 This is a simple ring buffer library for the Arduino. It is written in vanilla C, and can easily be modified to work with other platforms simply be removing the `#include "Arduino.h" `.  It can buffer any fixed size object (ints, floats, structs, etc...).
 
 ## Project History
-I needed a way to buffer sensor events for an engineering IOT project for a class I was taking at Cornell. I couldn't find any suitable Arduino Libraries that could buffer any sized object, so I wrote my own.
+I needed a way to buffer sensor events for a group engineering IOT project that I was working on at Cornell. We needed to record changes in IR trip wires that happened in ms timeframes, and tight loop polling was not working. We needed interrupts and a buffering library. I couldn't find any suitable Arduino Libraries that could buffer any sized object, so I wrote my own.
 
-I decided to give object oriented programming a shot using only C (no C++) with this library, of course, it still works with C++. Using C structs and function pointers, the library creates RingBuf objects that are complete with their own methods and attributes. Note that every method (except constructor), takes a `RingBuf *self` pointer. This is the equivalent of the `this` pointer in C++, but the C++ compiler automatically passes it behind the scenes. For this library, you must manually pass this as the first argument.
+I decided to give object oriented programming a shot using only C (no C++) with this library, of course, it still compiles with C++ compilers such as the Arduino IDE. Using C structs and function pointers, the library creates RingBuf objects that are complete with their own methods and attributes. Note that every method (except constructor), takes a `RingBuf *self` pointer. This is the equivalent of the `this` pointer in C++, but the C++ compiler automatically passes it behind the scenes. For this library, you must manually pass a the `RingBuf *self` pointer as the first argument.
 
 ## Use Cases
 
