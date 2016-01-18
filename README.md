@@ -1,15 +1,17 @@
 # ArduinoRingBuffer
 
-This is a simple ring buffer library for the Arduino. It is written in vanilla C, and can easily be modified to work with other platforms simply be removing the `#include "Arduino.h" `.  
+This is a simple ring buffer library for the Arduino. It is written in vanilla C, and can easily be modified to work with other platforms simply be removing the `#include "Arduino.h" `.  It can buffer any fixed size object (ints, floats, structs, etc...).
 
 
-I have heard about object orinted progrming in pure C, and I decided to give it a shot with this library. Using C structs and function pointers, one creates a RingBuf object that is complete with its own methods and attributes.
-
-
+I have heard about object oriented programing in pure C, and I decided to give it a shot with this library. Using C structs and function pointers, the library creates RingBuf objects that are complete with their own methods and attributes. Note that every method (except constructor), takes a `RingBuf *self` pointer. This is the equivalent of the `this` pointer in C++, but the C++ compiler automatically passes it behind the scenes. For this library, you must manually pass this as the first argument.
 
 ## Use Cases
 
 A ring buffer is used when passing asynchronous io between two threads. In the case of the Arduino, it is very useful for buffering data in an interrupt routine that is later processed in your `void loop()`.
+
+## Examples
+
+Look at the examples folder for several examples.
 
 ## API
 
@@ -20,7 +22,7 @@ A ring buffer is used when passing asynchronous io between two threads. In the c
 RingBuf *RingBuf_new(int size, int len);
 ```
 
-Creates a new RingBuf object of len elements that are size bytes each. A poetinter to the new RingBuf object is returned on success. On failure (lack of memory), a null pointer is returned.
+Creates a new RingBuf object of len elements that are size bytes each. A pointer to the new RingBuf object is returned on success. On failure (lack of memory), a null pointer is returned.
 This would be the equivalent of `new RingBuf(int size, int len)` in C++.
 
 ### Deconstructor
@@ -58,6 +60,12 @@ void *pull(RingBuf *self, void *object);
 
 Pull the first element out of the buffer. The first element is copied into the location pointed to by object. Returns a NULL pointer if the buffer is empty, otherwise returns object.
 
+### numElements()
+```
+unsigned int numElements(RingBuf *self);
+```
+
+Returns number of elements in buffer.
 
 ### isFull()
 ```
