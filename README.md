@@ -2,16 +2,28 @@
 
 This is a simple ring buffer library for the Arduino. It is written in vanilla C, and can easily be modified to work with other platforms simply be removing the `#include "Arduino.h" `.  It can buffer any fixed size object (ints, floats, structs, etc...).
 
+## Project History
+I needed a way to buffer sensor events for an engineering IOT project for a class I was taking at Cornell. I couldn't find any suitable Arduino Libraries that could buffer any sized object, so I wrote my own.
 
-I have heard about object oriented programing in pure C, and I decided to give it a shot with this library. Using C structs and function pointers, the library creates RingBuf objects that are complete with their own methods and attributes. Note that every method (except constructor), takes a `RingBuf *self` pointer. This is the equivalent of the `this` pointer in C++, but the C++ compiler automatically passes it behind the scenes. For this library, you must manually pass this as the first argument.
+I decided to give object oriented programming a shot using only C (no C++) with this library, of course, it still works with C++. Using C structs and function pointers, the library creates RingBuf objects that are complete with their own methods and attributes. Note that every method (except constructor), takes a `RingBuf *self` pointer. This is the equivalent of the `this` pointer in C++, but the C++ compiler automatically passes it behind the scenes. For this library, you must manually pass this as the first argument.
 
 ## Use Cases
 
 A ring buffer is used when passing asynchronous io between two threads. In the case of the Arduino, it is very useful for buffering data in an interrupt routine that is later processed in your `void loop()`.
 
+## Install
+
+Download this file as a zip, and extract the resulting folder into your Arduino Libraries folder. [Installing an Arduino Library] (https://www.arduino.cc/en/Guide/Libraries).
+
 ## Examples
 
 Look at the examples folder for several examples.
+
+## Contributing
+
+If you find this Arduino library helpful, click the Star button, and you will make my day.
+
+Feel free to improve this library. Fork it, make your changes, then submit a pull request!
 
 ## API
 
@@ -82,3 +94,7 @@ bool isEmpty(RingBuf *self);
 ```
 
 Returns true if buffer is empty, false otherwise.
+
+## License
+
+This library is open-source, and licensed under the [MIT license](http://opensource.org/licenses/MIT). Do whatever you like with it, but contributions are appreciated.
