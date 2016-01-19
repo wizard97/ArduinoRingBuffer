@@ -1,6 +1,6 @@
 # ArduinoRingBuffer
 
-This is a simple ring buffer library for the Arduino. It is written in vanilla C, and can easily be modified to work with other platforms simply be removing the `#include "Arduino.h" `.  It can buffer any fixed size object (ints, floats, structs, etc...).
+This is a simple ring buffer library for the Arduino. It is written in vanilla C, and can easily be modified to work with other platforms.  It can buffer any fixed size object (ints, floats, structs, etc...).
 
 ## Project History
 I needed a way to buffer sensor events for a group engineering IOT project that I was working on at Cornell. We needed to record changes in IR trip wires that happened in ms timeframes, and tight loop polling was not working. We needed interrupts and a buffering library. I couldn't find any suitable Arduino Libraries that could buffer any sized object, so I wrote my own.
@@ -62,7 +62,7 @@ Append an element to the buffer, where object is a pointer to object you wish to
 void *peek(RingBuf *self, unsigned int num);
 ```
 
-Peek at the num'th element in the buffer. Returns a void pointer to the location of the num'th element. If num is out of bounds or the num'th element is empty, a NULL pointer is returned. Cast the result of this call into a pointer of whatever type you are storing in the buffer. Note that this gives you direct memory access to the location of the num'th element in the buffer, allowing you to directly edit elements in the buffer.
+Peek at the num'th element in the buffer. Returns a void pointer to the location of the num'th element. If num is out of bounds or the num'th element is empty, a NULL pointer is returned. Cast the result of this call into a pointer of whatever type you are storing in the buffer. Note that this gives you direct memory access to the location of the num'th element in the buffer, allowing you to directly edit elements in the buffer. Note that while all of RingBuf's public methods are thread safe (including this one), directly using the pointer returned from this method is not thread safe. To use this returned pointer safely, disable interrupts first with `noInterrupts()`, do whatever you need to do with the pointer, then you can reenable interrupts by calling `interrupts()`.
 
 ### pull()
 
@@ -71,6 +71,7 @@ void *pull(RingBuf *self, void *object);
 ```
 
 Pull the first element out of the buffer. The first element is copied into the location pointed to by object. Returns a NULL pointer if the buffer is empty, otherwise returns object.
+
 
 ### numElements()
 ```

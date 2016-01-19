@@ -6,6 +6,7 @@
 */
 #include "RingBuf.h"
 #include <string.h>
+#include <util/atomic.h>
 
 /////// Constructor //////////
 RingBuf *RingBuf_new(int size, int len)
@@ -83,56 +84,97 @@ int RingBufIncrStart(RingBuf *self)
 // Add an object struct to RingBuf
 int RingBufAdd(RingBuf *self, void *object)
 {
-  int index = self->next_end_index(self);
-  if (index < 0) return -1;
-  memcpy(self->buf + index*self->size, object, self->size);
-  //if not empty incriment end index
-  if (!self->isEmpty(self)) self->incr_end_index(self);
-  self->elements++;
-  return index;
+  int index;
+  // Perform all atomic opertaions
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  {
+    index = self->next_end_index(self);
+    //if not full
+    if (index >= 0)
+    {
+      if (!self->isEmpty(self)) self->incr_end_index(self);
+      self->elements++;
+      memcpy(self->buf + index*self->size, object, self->size);
+    }
+  }
 
+  return index;
 }
 
 // Return pointer to num element, return null on empty or num out of bounds
 void *RingBufPeek(RingBuf *self, unsigned int num)
 {
-  //empty or out of bounds
-  if (self->isEmpty(self) || num > self->elements - 1) return NULL;
-
-  return &self->buf[((self->start + num)%self->len)*self->size];
+  void *ret;
+  // Perform all atomic opertaions
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  {
+    //empty or out of bounds
+    if (self->isEmpty(self) || num > self->elements - 1) ret = NULL;
+    else ret = &self->buf[((self->start + num)%self->len)*self->size];
+  }
+  return ret;
 }
 
 // Returns and removes first buffer element
 void *RingBufPull(RingBuf *self, void *object)
 {
-  if (self->isEmpty(self)) return NULL;
-  // Copy Object
-  memcpy(object, self->buf+self->start*self->size, self->size);
-  //Don't mess things up to much, even if called on an empty buffer
-  if (!self->isEmpty(self))
+  void *ret;
+  // Perform all atomic opertaions
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
   {
-    self->elements--;
-    // don't incriment if removing last element
-    if (!self->isEmpty(self)) self->incr_start_index(self);
+    if (self->isEmpty(self)) ret = NULL;
+    // Else copy Object
+    else
+    {
+      memcpy(object, self->buf+self->start*self->size, self->size);
+      self->elements--;
+      // don't incriment start if removing last element
+      if (!self->isEmpty(self)) self->incr_start_index(self);
+      ret = object;
+    }
   }
 
-  return object;
+  return ret;
 }
 
 // Returns number of elemnts in buffer
 unsigned int RingBufNumElements(RingBuf *self)
 {
-  return self->elements;
+  unsigned int elements;
+
+  // Perform all atomic opertaions
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  {
+    elements = self->elements;
+  }
+
+  return elements;
 }
 
 // Returns true if buffer is full
 bool RingBufIsFull(RingBuf *self)
 {
-  return self->elements == self->len;
+  bool ret;
+
+  // Perform all atomic opertaions
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  {
+    ret = self->elements == self->len;
+  }
+
+  return ret;
 }
 
 // Returns true if buffer is empty
 bool RingBufIsEmpty(RingBuf *self)
 {
-  return !self->elements;
+  bool ret;
+
+  // Perform all atomic opertaions
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  {
+    ret = !self->elements;
+  }
+
+  return ret;
 }

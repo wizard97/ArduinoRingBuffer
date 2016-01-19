@@ -49,7 +49,7 @@ void loop() {
   // Print the number of elements
   Serial.print("There are: ");
   Serial.print(buf->numElements(buf));
-  Serial.println(" elements in the ring buffer");
+  Serial.println(" element(s) in the ring buffer");
 
   // Check if empty
   if (buf->isEmpty(buf))
@@ -115,4 +115,3 @@ void print_buf_contents()
   Serial.println("______Done dumping contents_______");
 
 }
-
