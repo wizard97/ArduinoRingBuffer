@@ -1,6 +1,6 @@
 # ArduinoRingBuffer
 
-This is a simple ring buffer library for the Arduino. It is written in vanilla C, and can easily be modified to work with other platforms.  It can buffer any fixed size object (ints, floats, structs, etc...).
+This is a simple ring (FIFO) buffer library for the Arduino. It is written in vanilla C, and can easily be modified to work with other platforms.  It can buffer any fixed size object (ints, floats, structs, etc...).
 
 ## Project History
 I needed a way to buffer sensor events for a group engineering IOT project that I was working on at Cornell. We needed to record changes in IR trip wires that happened in ms timeframes, and tight loop polling was not working. We needed interrupts and a buffering library. I couldn't find any suitable Arduino Libraries that could buffer any sized object, so I wrote my own.
