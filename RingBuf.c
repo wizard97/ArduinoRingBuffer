@@ -92,9 +92,9 @@ int RingBufAdd(RingBuf *self, void *object)
     //if not full
     if (index >= 0)
     {
+      memcpy(self->buf + index*self->size, object, self->size);
       if (!self->isEmpty(self)) self->incr_end_index(self);
       self->elements++;
-      memcpy(self->buf + index*self->size, object, self->size);
     }
   }
 
