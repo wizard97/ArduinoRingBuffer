@@ -7,6 +7,26 @@ I needed a way to buffer sensor events for a group engineering IOT project that 
 
 I decided to give object oriented programming a shot using only C (no C++) with this library, of course, it still compiles with C++ compilers such as in the Arduino IDE. Using C structs and function pointers, the library creates RingBuf objects that are complete with their own methods and attributes. Note that every method (except constructor), takes a `RingBuf *self` pointer. This is the equivalent of the `this` pointer in C++, but the C++ compiler automatically passes it behind the scenes. For this library, you must manually pass a the `RingBuf *self` pointer as the first argument.
 
+
+## But I like C++'s object syntax... :(
+
+Fine. I reluctantly wrapped the C in a C++ class called `RingBufC`. All the methods are the same, except you no longer have to pass the this/self pointer. You can use either.
+
+```
+// If you want to use C...
+
+RingBuf *buf = RingBuf_new(sizeof(char*), 100);
+buf->add(buf, "I like C.");
+```
+
+```
+// If you want to use the C++ wrapper
+
+RingBufC buf(sizeof(char*), 100);
+buf.add("C++ has pretty object.method() syntax");
+```
+
+
 ## Use Cases
 
 A ring buffer is used when passing asynchronous io between two threads. In the case of the Arduino, it is very useful for buffering data in an interrupt routine that is later processed in your `void loop()`.
@@ -28,25 +48,6 @@ If you find this Arduino library helpful, click the Star button, and you will ma
 Feel free to improve this library. Fork it, make your changes, then submit a pull request!
 
 ## API
-
-## But I like C++'s object syntax... :(
-
-Fine. I reluctantly wrapped the C in a C++ class called `RingBufC`. All the methods are the same, except you no longer have to pass the this/self pointer. You can use either.
-
-```
-// If you want to use C...
-
-RingBuf *buf = RingBuf_new(sizeof(char*), 100);
-buf->add(buf, "I like C.");
-```
-
-```
-// If you want to use the C++ wrapper
-
-RingBufC buf(sizeof(char*), 100);
-buf.add("C++ has pretty object.method() syntax");
-```
-
 
 
 ### Constructor
