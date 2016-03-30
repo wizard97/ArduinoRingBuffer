@@ -82,7 +82,7 @@ int RingBufIncrStart(RingBuf *self)
 /////// PUBLIC METHODS //////////
 
 // Add an object struct to RingBuf
-int RingBufAdd(RingBuf *self, void *object)
+int RingBufAdd(RingBuf *self, const void *object)
 {
   int index;
   // Perform all atomic opertaions

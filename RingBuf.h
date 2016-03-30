@@ -9,6 +9,12 @@
 
 #include "Arduino.h"
 
+#ifndef __cplusplus
+#ifndef bool
+#define bool uint8_t
+#endif
+#endif
+
 typedef struct RingBuf RingBuf;
 
 typedef struct RingBuf
@@ -31,7 +37,7 @@ typedef struct RingBuf
   // Returns number of elemnts in buffer
   unsigned int (*numElements)(RingBuf*);
   // Add Event, Returns index where added in buffer, -1 on full buffer
-  int (*add) (RingBuf*, void*);
+  int (*add) (RingBuf*, const void*);
   // Returns pointer to nth element, NULL when nth element is empty
   void *(*peek) (RingBuf*, unsigned int);
   // Removes element and copies it to location pointed to by void *
@@ -51,7 +57,7 @@ int RingBuf_delete(RingBuf *self);
 int RingBufNextEndIndex(RingBuf *self);
 int RingBufIncrEnd(RingBuf *self);
 int RingBufIncrStart(RingBuf *self);
-int RingBufAdd(RingBuf *self, void *object);
+int RingBufAdd(RingBuf *self, const void *object);
 void *RingBufPeek(RingBuf *self, unsigned int num);
 void *RingBufPull(RingBuf *self, void *object);
 bool RingBufIsFull(RingBuf *self);
@@ -61,5 +67,32 @@ unsigned int RingBufNumElements(RingBuf *self);
 #ifdef __cplusplus
 }
 #endif
+
+
+// For those of you who cant live without pretty C++ objects....
+#ifdef __cplusplus
+class RingBufC
+{
+
+public:
+    RingBufC(int size, int len) { buf = RingBuf_new(size, len); }
+    ~RingBufC() { RingBuf_delete(buf); }
+
+    bool isFull() { return RingBufIsFull(buf); }
+    bool isEmpty() { return RingBufIsEmpty(buf); }
+    unsigned int numElements() { return RingBufNumElements(buf); }
+
+    unsigned int add(const void *object) { return RingBufAdd(buf, object); }
+    void *peek(unsigned int num) { return RingBufPeek(buf, num); }
+    void *pull(void *object) { return RingBufPull(buf, object); }
+
+    // Use this to check if memory allocation failed
+    bool allocFailed() { return !buf; }
+
+private:
+    RingBuf *buf;
+};
+#endif
+
 
 #endif

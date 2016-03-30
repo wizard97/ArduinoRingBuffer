@@ -1,11 +1,13 @@
 RingBuf		KEYWORD1
+RingBufC	KEYWORD1
 
 RingBuf_new	KEYWORD2
-RingBuf_delete		KEYWORD2
+RingBuf_delete	KEYWORD2
 
-isFull		KEYWORD2
-isEmpty		KEYWORD2
+isFull	KEYWORD2
+isEmpty	KEYWORD2
 numElements	KEYWORD2
 add	KEYWORD2
 peek	KEYWORD2
 pull	KEYWORD2
+allocFailed	KEYWORD2

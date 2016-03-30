@@ -29,6 +29,25 @@ Feel free to improve this library. Fork it, make your changes, then submit a pul
 
 ## API
 
+## But I like C++'s object syntax... :(
+
+Fine. I reluctantly wrapped the C in a C++ class called `RingBufC`. All the methods are the same, except you no longer have to pass the this/self pointer. You can use either.
+
+```
+// If you want to use C...
+
+RingBuf *buf = RingBuf_new(sizeof(char*), 100);
+buf->add(buf, "I like C.");
+```
+
+```
+// If you want to use the C++ wrapper
+
+RingBufC buf(sizeof(char*), 100);
+buf.add("C++ has pretty object.method() syntax");
+```
+
+
 
 ### Constructor
 
