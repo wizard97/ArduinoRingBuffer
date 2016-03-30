@@ -15,6 +15,7 @@ Fine. I reluctantly wrapped the C stuff in a C++ class called `RingBufC`. All th
 ```
 // If you want to use C...
 char *mystr = "I like C";
+
 RingBuf *buf = RingBuf_new(sizeof(char*), 100);
 buf->add(buf, &mystr);
 ```
@@ -22,7 +23,8 @@ buf->add(buf, &mystr);
 ```
 // If you want to use the C++ wrapper
 char *mystr = "C++ has pretty object.method() syntax";
-RingBufC buf(sizeof(char*), 100);
+
+RingBufC = buf(sizeof(char*), 100);
 buf.add(&mystr);
 ```
 
