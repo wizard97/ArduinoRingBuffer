@@ -13,7 +13,7 @@ I decided to give object oriented programming a shot using only C (no C++) with 
   <dd>The library only shallow copies objects into the buffer, it will not call the copy constructor. For many C++ objects this works fine, but if you require a deep copy you will have to look into libraries that supports something like C++ templates. And to be honest, you shouldn't be doing deep copies on a microcontroller or you could get random freezes from memory fragmentation.</dd>
 
 <dt>Does this library support non AVR platforms?</dt>
-  <dd>Currently no, see [#2](https://github.com/wizard97/ArduinoRingBuffer/issues/2). If someone knows of a portable replacement for the  `ATOMIC_BLOCK(ATOMIC_RESTORESTATE){}` macro please let me know.</dd>
+  <dd>Currently no, see <a href="https://github.com/wizard97/ArduinoRingBuffer/issues/2">#2</a>. If someone knows of a portable replacement for the  `ATOMIC_BLOCK(ATOMIC_RESTORESTATE){}` macro please let me know.</dd>
 </dl>
 ## But I like C++'s object syntax...
 
