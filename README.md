@@ -8,12 +8,13 @@ I needed a way to buffer sensor events for a group engineering IOT project that 
 I decided to give object oriented programming a shot using only C (no C++) with this library, of course, it still compiles with C++ compilers such as in the Arduino IDE. Using C structs and function pointers, the library creates RingBuf objects that are complete with their own methods and attributes. Note that every method (except constructor), takes a `RingBuf *self` pointer. This is the equivalent of the `this` pointer in C++, but the C++ compiler automatically passes it behind the scenes. For this library, you must manually pass a the `RingBuf *self` pointer as the first argument.
 
 ## FAQ's
-1. Can I buffer C++ objects?
-  The library only shallow copies objects into the buffer, it will not call the copy constructor. For many C++ objects this works fine, but if you require a deep copy you will have to look into libraries that supports something like C++ templates. And to be honest, you shouldn't be doing deep copies on a microcontroller or you could get random freezes from memory fragmentation.
+<dl>
+<dt>Can I buffer C++ objects?</dt>
+  <dd>The library only shallow copies objects into the buffer, it will not call the copy constructor. For many C++ objects this works fine, but if you require a deep copy you will have to look into libraries that supports something like C++ templates. And to be honest, you shouldn't be doing deep copies on a microcontroller or you could get random freezes from memory fragmentation.</dd>
 
-2. Does this library support non AVR platforms?
-  Currently no, see [#2](https://github.com/wizard97/ArduinoRingBuffer/issues/2). If someone knows of a portable replacement for the  `ATOMIC_BLOCK(ATOMIC_RESTORESTATE){}` macro please let me know.
-
+<dt>Does this library support non AVR platforms?</dt>
+  <dd>Currently no, see [#2](https://github.com/wizard97/ArduinoRingBuffer/issues/2). If someone knows of a portable replacement for the  `ATOMIC_BLOCK(ATOMIC_RESTORESTATE){}` macro please let me know.</dd>
+</dl>
 ## But I like C++'s object syntax...
 
 Fine. I reluctantly wrapped the C stuff in a C++ class called `RingBufC`. All the methods are the same, except you no longer have to pass the this/self pointer. You can use either.
