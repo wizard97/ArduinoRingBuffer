@@ -7,14 +7,7 @@ I needed a way to buffer sensor events for a group engineering IOT project that 
 
 I decided to give object oriented programming a shot using only C (no C++) with this library, of course, it still compiles with C++ compilers such as in the Arduino IDE. Using C structs and function pointers, the library creates RingBuf objects that are complete with their own methods and attributes. Note that every method (except constructor), takes a `RingBuf *self` pointer. This is the equivalent of the `this` pointer in C++, but the C++ compiler automatically passes it behind the scenes. For this library, you must manually pass a the `RingBuf *self` pointer as the first argument.
 
-## FAQ's
-<dl>
-<dt>Can I buffer C++ objects?</dt>
-  <dd>The library only shallow copies objects into the buffer, it will not call the copy constructor. For many C++ objects this works fine, but if you require a deep copy you will have to look into libraries that supports something like C++ templates. And to be honest, you shouldn't be doing deep copies on a microcontroller or you could get random freezes from memory fragmentation.</dd>
 
-<dt>Does this library support non AVR platforms?</dt>
-  <dd>Currently no, see <a href="https://github.com/wizard97/ArduinoRingBuffer/issues/2">#2</a>. If someone knows of a portable replacement for the  `ATOMIC_BLOCK(ATOMIC_RESTORESTATE){}` macro please let me know.</dd>
-</dl>
 ## But I like C++'s object syntax...
 
 Fine. I reluctantly wrapped the C stuff in a C++ class called `RingBufC`. All the methods are the same, except you no longer have to pass the this/self pointer. You can use either.
@@ -29,7 +22,7 @@ buf->add(buf, &mystr);
 
 ```
 // If you want to use the C++ wrapper
-char *mystr = "I like C++";
+char *mystr = "C++ has pretty object.method() syntax";
 
 RingBufC = buf(sizeof(char*), 100);
 buf.add(&mystr);
@@ -93,7 +86,7 @@ Append an element to the buffer, where object is a pointer to object you wish to
 void *peek(RingBuf *self, unsigned int num);
 ```
 
-Peek at the num'th element in the buffer. Returns a void pointer to the location of the num'th element. If num is out of bounds or the num'th element is empty, a NULL pointer is returned. Cast the result of this call into a pointer of whatever type you are storing in the buffer. Note that this gives you direct memory access to the location of the num'th element in the buffer, allowing you to directly edit elements in the buffer. Note that while all of RingBuf's public methods are thread safe (including this one), directly using the pointer returned from this method is not thread safe. If there is a possibility an interrupt could fire and remove/modify the item pointed to by the returned pointer, disable interrupts first with `noInterrupts()`, do whatever you need to do with the pointer, then you can reenable interrupts by calling `interrupts()`.
+Peek at the num'th element in the buffer. Returns a void pointer to the location of the num'th element. If num is out of bounds or the num'th element is empty, a NULL pointer is returned. Cast the result of this call into a pointer of whatever type you are storing in the buffer. Note that this gives you direct memory access to the location of the num'th element in the buffer, allowing you to directly edit elements in the buffer. Note that while all of RingBuf's public methods are thread safe (including this one), directly using the pointer returned from this method is not thread safe. To use this returned pointer safely, disable interrupts first with `noInterrupts()`, do whatever you need to do with the pointer, then you can reenable interrupts by calling `interrupts()`.
 
 ### pull()
 

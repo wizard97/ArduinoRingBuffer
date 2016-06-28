@@ -6,7 +6,6 @@
 */
 #include "RingBuf.h"
 #include <string.h>
-#include <util/atomic.h>
 
 /////// Constructor //////////
 RingBuf *RingBuf_new(int size, int len)
@@ -86,7 +85,7 @@ int RingBufAdd(RingBuf *self, const void *object)
 {
   int index;
   // Perform all atomic opertaions
-  ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  RB_ATOMIC_START
   {
     index = self->next_end_index(self);
     //if not full
@@ -97,6 +96,7 @@ int RingBufAdd(RingBuf *self, const void *object)
       self->elements++;
     }
   }
+  RB_ATOMIC_END
 
   return index;
 }
@@ -104,23 +104,25 @@ int RingBufAdd(RingBuf *self, const void *object)
 // Return pointer to num element, return null on empty or num out of bounds
 void *RingBufPeek(RingBuf *self, unsigned int num)
 {
-  void *ret;
+  void *ret = NULL;
   // Perform all atomic opertaions
-  ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  RB_ATOMIC_START
   {
     //empty or out of bounds
     if (self->isEmpty(self) || num > self->elements - 1) ret = NULL;
     else ret = &self->buf[((self->start + num)%self->len)*self->size];
   }
+  RB_ATOMIC_END
+
   return ret;
 }
 
 // Returns and removes first buffer element
 void *RingBufPull(RingBuf *self, void *object)
 {
-  void *ret;
+  void *ret = NULL;
   // Perform all atomic opertaions
-  ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  RB_ATOMIC_START
   {
     if (self->isEmpty(self)) ret = NULL;
     // Else copy Object
@@ -133,6 +135,7 @@ void *RingBufPull(RingBuf *self, void *object)
       ret = object;
     }
   }
+  RB_ATOMIC_END
 
   return ret;
 }
@@ -143,10 +146,11 @@ unsigned int RingBufNumElements(RingBuf *self)
   unsigned int elements;
 
   // Perform all atomic opertaions
-  ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  RB_ATOMIC_START
   {
     elements = self->elements;
   }
+  RB_ATOMIC_END
 
   return elements;
 }
@@ -157,10 +161,11 @@ bool RingBufIsFull(RingBuf *self)
   bool ret;
 
   // Perform all atomic opertaions
-  ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  RB_ATOMIC_START
   {
     ret = self->elements == self->len;
   }
+  RB_ATOMIC_END
 
   return ret;
 }
@@ -171,10 +176,11 @@ bool RingBufIsEmpty(RingBuf *self)
   bool ret;
 
   // Perform all atomic opertaions
-  ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  RB_ATOMIC_START
   {
     ret = !self->elements;
   }
+  RB_ATOMIC_END
 
   return ret;
 }
