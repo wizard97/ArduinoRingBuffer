@@ -34,7 +34,7 @@
         #define xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
     #endif
 
-    #define RB_ATOMIC_START do { uint32_t _savedIS = xt_rsil(1) ;
+    #define RB_ATOMIC_START do { uint32_t _savedIS = xt_rsil(15) ;
     #define RB_ATOMIC_END xt_wsr_ps(_savedIS) ;} while(0);
 #else
     #error “This library only supports AVR and ESP8266 Boards.”
