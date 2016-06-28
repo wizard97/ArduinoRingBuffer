@@ -33,6 +33,11 @@ buf.add(&mystr);
 
 A ring buffer is used when passing asynchronous io between two threads. In the case of the Arduino, it is very useful for buffering data in an interrupt routine that is later processed in your `void loop()`.
 
+## Supported Platforms
+The library currently supports:
+- AVR
+- ESP8266
+
 ## Install
 
 This library is now availible in the Arduino Library Manager, directly in the IDE. Go to `Sketch > Include Library > Manage Libraries` and search for `RingBuf`.
