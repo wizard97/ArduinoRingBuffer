@@ -17,7 +17,7 @@ I decided to give object oriented programming a shot using only C (no C++) with 
 
 Fine. I reluctantly wrapped the C stuff in a C++ class called `RingBufC`. All the methods are the same, except you no longer have to pass the this/self pointer. You can use either.
 
-```
+```c++
 // If you want to use C...
 char *mystr = "I like C";
 
@@ -25,7 +25,7 @@ RingBuf *buf = RingBuf_new(sizeof(char*), 100);
 buf->add(buf, &mystr);
 ```
 
-```
+```c++
 // If you want to use the C++ wrapper
 char *mystr = "C++ has pretty object.method() syntax";
 
@@ -64,7 +64,7 @@ Feel free to improve this library. Fork it, make your changes, then submit a pul
 
 ### Constructor
 
-```
+```c++
 RingBuf *RingBuf_new(int size, int len);
 ```
 
@@ -73,7 +73,7 @@ This would be the equivalent of `new RingBuf(int size, int len)` in C++.
 
 ### Deconstructor
 
-```
+```c++
 int RingBuf_delete(RingBuf *self);
 ```
 
@@ -84,7 +84,7 @@ Deletes the RingBuf, and frees up all the memory associated with it.
 
 ### add()
 
-```
+```c++
 int add(RingBuf *self, void *object);
 ```
 
@@ -92,7 +92,7 @@ Append an element to the buffer, where object is a pointer to object you wish to
 
 ### peek()
 
-```
+```c++
 void *peek(RingBuf *self, unsigned int num);
 ```
 
@@ -100,7 +100,7 @@ Peek at the num'th element in the buffer. Returns a void pointer to the location
 
 ### pull()
 
-```
+```c++
 void *pull(RingBuf *self, void *object);
 ```
 
@@ -108,14 +108,14 @@ Pull the first element out of the buffer. The first element is copied into the l
 
 
 ### numElements()
-```
+```c++
 unsigned int numElements(RingBuf *self);
 ```
 
 Returns number of elements in buffer.
 
 ### isFull()
-```
+```c++
 bool isFull(RingBuf *self);
 ```
 
@@ -124,7 +124,7 @@ Returns true if buffer is full, otherwise false.
 
 ### isEmpty()
 
-```
+```c++
 bool isEmpty(RingBuf *self);
 ```
 
