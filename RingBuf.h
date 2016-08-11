@@ -7,11 +7,15 @@
 #ifndef RingBuf_h
 #define RingBuf_h
 
-#include "Arduino.h"
+#ifdef ARDUINO
+    #include <Arduino.h>
+#else
+    #include <stdint.h>
+#endif
 
 #ifndef __cplusplus
 #ifndef bool
-#define bool uint8_t
+    #define bool uint8_t
 #endif
 #endif
 
@@ -38,7 +42,7 @@
         #endif
 
         #define RB_ATOMIC_START do { uint32_t _savedIS = xt_rsil(15) ;
-        #define RB_ATOMIC_END xt_wsr_ps(_savedIS) ;} while(0);
+        #define RB_ATOMIC_END xt_wsr_ps(_savedIS); } while(0);
 
     #else
         #define RB_ATOMIC_START {
