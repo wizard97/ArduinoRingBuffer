@@ -5,34 +5,19 @@ This is a simple ring (FIFO) buffer library for the Arduino. It is written in va
 ## Project History
 I needed a way to buffer sensor events for a group engineering IOT project that I was working on at Cornell. We needed to record changes in IR trip wires that happened in ms timeframes, and tight loop polling was not working. We needed interrupts and a buffering library. I couldn't find any suitable Arduino Libraries that could buffer any sized object, so I wrote my own.
 
-I decided to give object oriented programming a shot using only C (no C++) with this library, of course, it still compiles with C++ compilers such as in the Arduino IDE. Using C structs and function pointers, the library creates RingBuf objects that are complete with their own methods and attributes. Note that every method (except constructor), takes a `RingBuf *self` pointer. This is the equivalent of the `this` pointer in C++, but the C++ compiler automatically passes it behind the scenes. For this library, you must manually pass a the `RingBuf *self` pointer as the first argument.
-
-## FAQ's
- <dl>
- <dt>Can I buffer C++ objects?</dt>
-   <dd>The library only shallow copies objects into the buffer, it will not call the copy constructor. For many C++ objects this works fine, but if you require a deep copy you will have to look into libraries that supports something like C++ templates. And to be honest, you shouldn't be doing deep copies on a microcontroller or you could get random freezes from memory fragmentation.</dd>
- </dl>
-
-## But I like C++'s object syntax...
-
-Fine. I reluctantly wrapped the C stuff in a C++ class called `RingBufC`. All the methods are the same, except you no longer have to pass the this/self pointer. You can use either.
+I decided to give object oriented programming a shot using only C (no C++) with this library, of course, it still compiles with C++ compilers such as in the Arduino IDE. Using C structs and function pointers, the library creates RingBuf objects that are complete with their own methods and attributes. Note that every method (except constructor), takes a `RingBuf *self` pointer. This is the equivalent of the `this` pointer in C++, but the C++ compiler automatically passes it behind the scenes. For this library, you must manually pass a the `RingBuf *self` pointer as the first argument, like this:
 
 ```c++
-// If you want to use C...
 char *mystr = "I like C";
 
 RingBuf *buf = RingBuf_new(sizeof(char*), 100);
 buf->add(buf, &mystr);
 ```
 
-```c++
-// If you want to use the C++ wrapper
-char *mystr = "C++ has pretty object.method() syntax";
+## What about C++ templates?
 
-RingBufC = buf(sizeof(char*), 100);
-buf.add(&mystr);
-```
-
+I recently created a C++ alternative to this library that utilizes the power of C++ templates, now you can perform deep copies of objects.
+Check it out: [C++ alternative library] (https://github.com/wizard97/Embedded_RingBuf_CPP).
 
 ## Use Cases
 
