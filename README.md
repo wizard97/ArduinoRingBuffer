@@ -5,7 +5,15 @@ This is a simple ring (FIFO) buffer library for the Arduino. It is written in va
 ## Project History
 I needed a way to buffer sensor events for a group engineering IOT project that I was working on at Cornell. We needed to record changes in IR trip wires that happened in ms timeframes, and tight loop polling was not working. We needed interrupts and a buffering library. I couldn't find any suitable Arduino Libraries that could buffer any sized object, so I wrote my own.
 
-I decided to give object oriented programming a shot using only C (no C++) with this library, of course, it still compiles with C++ compilers such as in the Arduino IDE. Using C structs and function pointers, the library creates RingBuf objects that are complete with their own methods and attributes. Note that every method (except constructor), takes a `RingBuf *self` pointer. This is the equivalent of the `this` pointer in C++, but the C++ compiler automatically passes it behind the scenes. For this library, you must manually pass a the `RingBuf *self` pointer as the first argument.
+I decided to give object oriented programming a shot using only C (no C++) with this library, of course, it still compiles with C++ compilers such as in the Arduino IDE. Using C structs and function pointers, the library creates RingBuf objects that are complete with their own methods and attributes. Note that every method (except constructor), takes a `RingBuf *self` pointer. This is the equivalent of the `this` pointer in C++, but the C++ compiler automatically passes it behind the scenes. For this library, you must manually pass a the `RingBuf *self` pointer as the first argument, like this:
+
+
+```c++
+char *mystr = "I like C";
+
+RingBuf *buf = RingBuf_new(sizeof(char*), 100);
+buf->add(buf, &mystr);
+```
 
 ## FAQ's
  <dl>
@@ -13,26 +21,10 @@ I decided to give object oriented programming a shot using only C (no C++) with 
    <dd>The library only shallow copies objects into the buffer, it will not call the copy constructor. For many C++ objects this works fine, but if you require a deep copy you will have to look into libraries that supports something like C++ templates. And to be honest, you shouldn't be doing deep copies on a microcontroller or you could get random freezes from memory fragmentation.</dd>
  </dl>
 
-## But I like C++'s object syntax...
+## What about C++ templates?
 
-Fine. I reluctantly wrapped the C stuff in a C++ class called `RingBufC`. All the methods are the same, except you no longer have to pass the this/self pointer. You can use either.
-
-```c++
-// If you want to use C...
-char *mystr = "I like C";
-
-RingBuf *buf = RingBuf_new(sizeof(char*), 100);
-buf->add(buf, &mystr);
-```
-
-```c++
-// If you want to use the C++ wrapper
-char *mystr = "C++ has pretty object.method() syntax";
-
-RingBufC = buf(sizeof(char*), 100);
-buf.add(&mystr);
-```
-
+I recently created a C++ alternative to this library that utilizes the power of C++ templates, now you can perform deep copies of objects.
+Check it out: [C++ alternative library] (https://github.com/wizard97/Embedded_RingBuf_CPP).
 
 ## Use Cases
 
@@ -42,10 +34,11 @@ A ring buffer is used when passing asynchronous io between two threads. In the c
 The library currently supports:
 - AVR
 - ESP8266
+- Any other platform with a C compiler (you should implement the `RB_ATOMIC_START` and `RB_ATOMIC_END` macros)
 
 ## Install
 
-This library is now availible in the Arduino Library Manager, directly in the IDE. Go to `Sketch > Include Library > Manage Libraries` and search for `RingBuf`.
+This library is now available in the Arduino Library Manager, directly in the IDE. Go to `Sketch > Include Library > Manage Libraries` and search for `RingBuf`.
 
 To manually install this library, download this file as a zip, and extract the resulting folder into your Arduino Libraries folder. [Installing an Arduino Library] (https://www.arduino.cc/en/Guide/Libraries).
 
@@ -65,11 +58,11 @@ Feel free to improve this library. Fork it, make your changes, then submit a pul
 ### Constructor
 
 ```c++
-RingBuf *RingBuf_new(int size, int len);
+RingBuf *RingBuf_new(size_t size, size_t maxElements)
 ```
 
-Creates a new RingBuf object of len elements that are size bytes each. A pointer to the new RingBuf object is returned on success. On failure (lack of memory), a null pointer is returned.
-This would be the equivalent of `new RingBuf(int size, int len)` in C++.
+Creates a new RingBuf object that can hold up to maxElements that are size bytes each. A pointer to the new RingBuf object is returned on success. On failure (lack of memory), a null pointer is returned.
+This would be the equivalent of `new RingBuf(size_t size, size_t maxElements)` in C++.
 
 ### Deconstructor
 
@@ -85,31 +78,31 @@ Deletes the RingBuf, and frees up all the memory associated with it.
 ### add()
 
 ```c++
-int add(RingBuf *self, void *object);
+bool add(RingBuf *self, const void *object)
 ```
 
-Append an element to the buffer, where object is a pointer to object you wish to append. Returns -1 on a full buffer. On success, returns the position (index) in the buffer where the element was added.
+Append an element to the buffer, where object is a pointer to object you wish to append. Returns true on success, false on a full buffer.
 
 ### peek()
 
 ```c++
-void *peek(RingBuf *self, unsigned int num);
+void *peek(RingBuf *self, size_t index)
 ```
 
-Peek at the num'th element in the buffer. Returns a void pointer to the location of the num'th element. If num is out of bounds or the num'th element is empty, a NULL pointer is returned. Cast the result of this call into a pointer of whatever type you are storing in the buffer. Note that this gives you direct memory access to the location of the num'th element in the buffer, allowing you to directly edit elements in the buffer. Note that while all of RingBuf's public methods are thread safe (including this one), directly using the pointer returned from this method is not thread safe. If there is a possibility an interrupt could fire and remove/modify the item pointed to by the returned pointer, disable interrupts first with `noInterrupts()`, do whatever you need to do with the pointer, then you can reenable interrupts by calling `interrupts()`.
+Peek at the element at index in the buffer. Returns a void pointer to the location element. If index is out of bounds or empty, a NULL pointer is returned. Cast the result of this call into a pointer of whatever type you are storing in the buffer. Note that this gives you direct memory access to the location of the element at index in the buffer, allowing you to directly edit elements in the buffer. Note that while all of RingBuf's public methods are thread safe (including this one), directly using the pointer returned from this method is not thread safe. If there is a possibility an interrupt could fire and remove/modify the item pointed to by the returned pointer, disable interrupts first with `noInterrupts()`, do whatever you need to do with the pointer, then you can reenable interrupts by calling `interrupts()`.
 
 ### pull()
 
 ```c++
-void *pull(RingBuf *self, void *object);
+bool pull(RingBuf *self, void *object)
 ```
 
-Pull the first element out of the buffer. The first element is copied into the location pointed to by object. Returns a NULL pointer if the buffer is empty, otherwise returns object.
+Pull the first element out of the buffer. The first element is copied into the location pointed to by object. Returns true on success, false if the buffer is empty.
 
 
 ### numElements()
 ```c++
-unsigned int numElements(RingBuf *self);
+size_t numElements(RingBuf *self)
 ```
 
 Returns number of elements in buffer.

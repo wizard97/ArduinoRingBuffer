@@ -50,10 +50,6 @@ void setup() {
     Serial.println("As expected, foo is a copy of bar");
   }
 
-  // Delete RingBuf object
-  RingBuf_delete(my_buf);
-  my_buf = NULL;
-
 }
 
 

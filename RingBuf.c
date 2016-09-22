@@ -1,19 +1,19 @@
 /*
   RingBuf.c - Library for implementing a simple Ring Buffer on Arduino boards.
   Created by D. Aaron Wisner (daw268@cornell.edu)
-  January 17, 2015.
+  January 17, 2016.
   Released into the public domain.
 */
 #include "RingBuf.h"
 #include <string.h>
 
 /////// Constructor //////////
-RingBuf *RingBuf_new(int size, int len)
+RingBuf *RingBuf_new(size_t size, size_t maxElements)
 {
   RingBuf *self = (RingBuf *)malloc(sizeof(RingBuf));
   if (!self) return NULL;
   memset(self, 0, sizeof(RingBuf));
-  if (RingBuf_init(self, size, len) < 0)
+  if (!RingBuf_init(self, size, maxElements))
   {
     free(self);
     return NULL;
@@ -21,96 +21,77 @@ RingBuf *RingBuf_new(int size, int len)
   return self;
 }
 
-int RingBuf_init(RingBuf *self, int size, int len)
+bool RingBuf_init(RingBuf *self, size_t size, size_t maxElements)
 {
-  self->buf = (unsigned char *)malloc(size*len);
-  if (!self->buf) return -1;
-  memset(self->buf, 0, size*len);
+  self->_buf = (uint8_t *)malloc(size*maxElements);
+  if (!self->_buf) return false;
+  memset(self->_buf, 0, size*maxElements);
 
-  self->size = size;
-  self->len = len;
-  self->start = 0;
-  self->end = 0;
-  self->elements = 0;
+  self->_size = size;
+  self->_maxElements = maxElements;
 
-  self->next_end_index = &RingBufNextEndIndex;
-  self->incr_end_index = &RingBufIncrEnd;
-  self->incr_start_index = &RingBufIncrStart;
-  self->isFull = &RingBufIsFull;
-  self->isEmpty = &RingBufIsEmpty;
-  self->add = &RingBufAdd;
-  self->numElements = &RingBufNumElements;
-  self->peek = &RingBufPeek;
-  self->pull = &RingBufPull;
-  return 0;
+  self->_head = 0;
+  self->_elements = 0;
+
+  //initlize the virtual public methods
+  self->isFull = &RingBuf_isFull;
+  self->isEmpty = &RingBuf_isEmpty;
+  self->add = &RingBuf_add;
+  self->numElements = &RingBuf_numElements;
+  self->peek = &RingBuf_peek;
+  self->pull = &RingBuf_pull;
+  return true;
 }
+
 /////// Deconstructor //////////
-int RingBuf_delete(RingBuf *self)
+bool RingBuf_delete(RingBuf *self)
 {
-  free(self->buf);
+  free(self->_buf);
   free(self);
-  return 0;
+  return true;
 }
 
 /////// PRIVATE METHODS //////////
 
-// get next empty index
-int RingBufNextEndIndex(RingBuf *self)
+// Calculate poistion of tail
+size_t RingBuf_getTail(RingBuf *self)
 {
-  //buffer is full
-  if (self->isFull(self)) return -1;
-  //if empty dont incriment
-  return (self->end+(unsigned int)!self->isEmpty(self))%self->len;
-}
-
-// incriment index of RingBuf struct, only call if safe to do so
-int RingBufIncrEnd(RingBuf *self)
-{
-  self->end = (self->end+1)%self->len;
-  return self->end;
-}
-
-
-// incriment index of RingBuf struct, only call if safe to do so
-int RingBufIncrStart(RingBuf *self)
-{
-  self->start = (self->start+1)%self->len;
-  return self->start;
+    return (self->_head + (self->_maxElements - self->_elements))%self->_maxElements;
 }
 
 /////// PUBLIC METHODS //////////
 
 // Add an object struct to RingBuf
-int RingBufAdd(RingBuf *self, const void *object)
+bool RingBuf_add(RingBuf *self, const void *object)
 {
-  int index;
   // Perform all atomic opertaions
+  bool full = self->isFull(self);
+
   RB_ATOMIC_START
   {
-    index = self->next_end_index(self);
     //if not full
-    if (index >= 0)
+    if (!full)
     {
-      memcpy(self->buf + index*self->size, object, self->size);
-      if (!self->isEmpty(self)) self->incr_end_index(self);
-      self->elements++;
+      memcpy(&self->_buf[self->_size*self->_head], object, self->_size);
+      self->_head = (self->_head + 1)%self->_maxElements;
+      self->_elements++;
     }
   }
   RB_ATOMIC_END
 
-  return index;
+  return !full;
 }
 
-// Return pointer to num element, return null on empty or num out of bounds
-void *RingBufPeek(RingBuf *self, unsigned int num)
+// Return pointer to the element at index, return null on empty or out of bounds
+void *RingBuf_peek(RingBuf *self, size_t index)
 {
   void *ret = NULL;
   // Perform all atomic opertaions
   RB_ATOMIC_START
   {
     //empty or out of bounds
-    if (self->isEmpty(self) || num > self->elements - 1) ret = NULL;
-    else ret = &self->buf[((self->start + num)%self->len)*self->size];
+    if (self->isEmpty(self) || index > self->_elements) ret = NULL;
+    else ret = &self->_buf[((RingBuf_getTail(self) + index)%self->_maxElements)*self->_size];
   }
   RB_ATOMIC_END
 
@@ -118,21 +99,16 @@ void *RingBufPeek(RingBuf *self, unsigned int num)
 }
 
 // Returns and removes first buffer element
-void *RingBufPull(RingBuf *self, void *object)
+bool RingBuf_pull(RingBuf *self, void *object)
 {
-  void *ret = NULL;
+  bool ret = false;
   // Perform all atomic opertaions
   RB_ATOMIC_START
   {
-    if (self->isEmpty(self)) ret = NULL;
-    // Else copy Object
-    else
-    {
-      memcpy(object, self->buf+self->start*self->size, self->size);
-      self->elements--;
-      // don't incriment start if removing last element
-      if (!self->isEmpty(self)) self->incr_start_index(self);
-      ret = object;
+    if (!self->isEmpty(self)) {
+      memcpy(object, &self->_buf[RingBuf_getTail(self)*self->_size], self->_size);
+      self->_elements--;
+      ret = true;
     }
   }
   RB_ATOMIC_END
@@ -141,14 +117,14 @@ void *RingBufPull(RingBuf *self, void *object)
 }
 
 // Returns number of elemnts in buffer
-unsigned int RingBufNumElements(RingBuf *self)
+size_t RingBuf_numElements(RingBuf *self)
 {
-  unsigned int elements;
+  size_t elements;
 
   // Perform all atomic opertaions
   RB_ATOMIC_START
   {
-    elements = self->elements;
+    elements = self->_elements;
   }
   RB_ATOMIC_END
 
@@ -156,14 +132,14 @@ unsigned int RingBufNumElements(RingBuf *self)
 }
 
 // Returns true if buffer is full
-bool RingBufIsFull(RingBuf *self)
+bool RingBuf_isFull(RingBuf *self)
 {
   bool ret;
 
   // Perform all atomic opertaions
   RB_ATOMIC_START
   {
-    ret = self->elements == self->len;
+    ret = self->_elements == self->_maxElements;
   }
   RB_ATOMIC_END
 
@@ -171,14 +147,14 @@ bool RingBufIsFull(RingBuf *self)
 }
 
 // Returns true if buffer is empty
-bool RingBufIsEmpty(RingBuf *self)
+bool RingBuf_isEmpty(RingBuf *self)
 {
   bool ret;
 
   // Perform all atomic opertaions
   RB_ATOMIC_START
   {
-    ret = !self->elements;
+    ret = !self->_elements;
   }
   RB_ATOMIC_END
 
