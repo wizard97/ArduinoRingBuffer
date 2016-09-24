@@ -90,7 +90,7 @@ void *RingBuf_peek(RingBuf *self, size_t index)
   RB_ATOMIC_START
   {
     //empty or out of bounds
-    if (self->isEmpty(self) || index > self->_elements) ret = NULL;
+    if (self->isEmpty(self) || index > self->_elements - 1) ret = NULL;
     else ret = &self->_buf[((RingBuf_getTail(self) + index)%self->_maxElements)*self->_size];
   }
   RB_ATOMIC_END
