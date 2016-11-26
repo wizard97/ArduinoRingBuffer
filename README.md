@@ -12,7 +12,7 @@ I decided to give object oriented programming a shot using only C (no C++) with 
 char *mystr = "I like C";
 
 RINGBUF_STACKALLOC(sizeof(char *), 10);
-buf->add(buf, &mystr);
+buf.add(buf, &mystr);
 ```
 
 ## FAQ's
