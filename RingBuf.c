@@ -47,7 +47,6 @@ RingBuf *RingBuf_init(RingBuf *self, uint8_t *buf, size_t size, size_t maxElemen
 /////// Deconstructor //////////
 bool RingBuf_delete(RingBuf *self)
 {
-    free(self->_buf);
     free(self);
     return true;
 }
