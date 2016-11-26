@@ -60,6 +60,18 @@
 
 
 
+// Magic Macro constructors //
+
+/* Stack allocate the buffer (bit of a hack, but works)*/
+#define RINGBUF_STACKALLOC(NAME, SIZE, MAX_ELEMENTS) \
+    RingBuf NAME; \
+    static uint8_t NAME##_STOR [SIZE*MAX_ELEMENTS] = { }; \
+    bool NAME##_TMP = RingBuf_init(&NAME, NAME##_STOR, SIZE, MAX_ELEMENTS)
+
+/* Heap allocate the buffer*/
+#define RINGBUF_HEAPALLOC(NAME, SIZE, MAX_ELEMENTS) \
+    RingBuf *NAME = RingBuf_new(SIZE, MAX_ELEMENTS)
+
 typedef struct RingBuf RingBuf;
 
 typedef struct RingBuf
@@ -85,12 +97,13 @@ typedef struct RingBuf
 
 } RingBuf;
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+RingBuf *RingBuf_init(RingBuf *self, uint8_t *buf, size_t size, size_t maxElements);
 RingBuf *RingBuf_new(size_t size, size_t maxElements);
-bool RingBuf_init(RingBuf *self, size_t size, size_t maxElements);
 bool RingBuf_delete(RingBuf *self);
 
 // private
