@@ -72,6 +72,10 @@
 #define RINGBUF_HEAPALLOC(NAME, SIZE, MAX_ELEMENTS) \
     RingBuf *NAME = RingBuf_new(SIZE, MAX_ELEMENTS)
 
+/* Delete the Ring Buf, only call when buffer was allocated with HEAPALLOC*/
+#define RINGBUF_DELETE(NAME) \
+    RingBuf_free(NAME)
+
 typedef struct RingBuf RingBuf;
 
 typedef struct RingBuf

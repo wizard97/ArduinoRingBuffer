@@ -57,20 +57,27 @@ Feel free to improve this library. Fork it, make your changes, then submit a pul
 
 ### Constructor
 
-```c++
-RingBuf *RingBuf_new(size_t size, size_t maxElements)
-```
 
-Creates a new RingBuf object that can hold up to maxElements that are size bytes each. A pointer to the new RingBuf object is returned on success. On failure (lack of memory), a null pointer is returned.
-This would be the equivalent of `new RingBuf(size_t size, size_t maxElements)` in C++.
+```c++
+// Heap allocate
+RINGBUF_STACKALLOC(NAME, size size_t, size_t maxElements)
+```
+Create a new RingBuf object that can hold up to maxElements that are size bytes each. Note that memory is allocated from the stack, this is the preferred way to create it. A RingBuf object called `NAME` is created (`RingBuf`).
+
+```c++
+// Heap allocate
+RINGBUF_HEAPALLOC(NAME, size size_t, size_t maxElements)
+```
+Allocate a new RingBuf object that can hold up to MAX_ELEMENTS that are size bytes each. Note that memory is allocated at run time from the heap.
+A pointer to the new RingBuf object called `NAME` is created (`RingBuf *`). On failure (lack of memory), NAME is set to NULL. This would be the equivalent of using `new` in C++.
 
 ### Deconstructor
 
 ```c++
-int RingBuf_delete(RingBuf *self);
+RINGBUF_DELETE(RingBuf *)
 ```
 
-Deletes the RingBuf, and frees up all the memory associated with it.
+Deletes the RingBuf, and frees up all the memory associated with it. Only call if the RingBuf was created with `RINGBUF_HEAPALLOC()`
 
 ## Methods
 
