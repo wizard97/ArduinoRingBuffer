@@ -11,7 +11,7 @@ I decided to give object oriented programming a shot using only C (no C++) with 
 ```c++
 char *mystr = "I like C";
 
-RingBuf *buf = RingBuf_new(sizeof(char*), 100);
+RINGBUF_STACKALLOC(sizeof(char *), 10);
 buf->add(buf, &mystr);
 ```
 
@@ -74,7 +74,7 @@ A pointer to the new RingBuf object called `NAME` is created (`RingBuf *`). On f
 ### Deconstructor
 
 ```c++
-RINGBUF_DELETE(RingBuf *)
+RINGBUF_DELETE(RingBuf *rb)
 ```
 
 Deletes the RingBuf, and frees up all the memory associated with it. Only call if the RingBuf was created with `RINGBUF_HEAPALLOC()`
