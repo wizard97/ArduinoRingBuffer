@@ -11,7 +11,7 @@ I decided to give object oriented programming a shot using only C (no C++) with 
 ```c++
 char *mystr = "I like C";
 
-RINGBUF_STACKALLOC(sizeof(char *), 10);
+RINGBUF_STACKALLOC(buf, sizeof(char *), 10);
 buf.add(buf, &mystr);
 ```
 
