@@ -65,7 +65,7 @@
 /* Stack allocate the buffer (bit of a hack, but works)*/
 #define RINGBUF_STACKALLOC(NAME, SIZE, MAX_ELEMENTS) \
     RingBuf NAME; \
-    static uint8_t NAME##_STOR [SIZE*MAX_ELEMENTS] = { }; \
+    static uint8_t NAME##_STOR [SIZE*MAX_ELEMENTS] = { 0 }; \
     bool NAME##_TMP = RingBuf_init(&NAME, NAME##_STOR, SIZE, MAX_ELEMENTS)
 
 /* Heap allocate the buffer*/
