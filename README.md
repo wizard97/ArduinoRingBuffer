@@ -11,7 +11,7 @@ I decided to give object oriented programming a shot using only C (no C++) with 
 ```c++
 char *mystr = "I like C";
 
-RINGBUF_STACKALLOC(buf, sizeof(char *), 10);
+RB_STACKALLOC(buf, sizeof(char *), 10);
 buf.add(buf, &mystr);
 ```
 
@@ -59,14 +59,14 @@ Feel free to improve this library. Fork it, make your changes, then submit a pul
 
 
 ```c++
-// Heap allocate
-RINGBUF_STACKALLOC(NAME, size size_t, size_t maxElements)
+// Stack allocate
+RB_STACKALLOC(NAME, size size_t, size_t maxElements)
 ```
 Create a new RingBuf object that can hold up to maxElements that are size bytes each. Note that memory is allocated from the stack, this is the preferred way to create it. A RingBuf object called `NAME` is created (`RingBuf`).
 
 ```c++
 // Heap allocate
-RINGBUF_HEAPALLOC(NAME, size size_t, size_t maxElements)
+RB_HEAPALLOC(NAME, size size_t, size_t maxElements)
 ```
 Allocate a new RingBuf object that can hold up to MAX_ELEMENTS that are size bytes each. Note that memory is allocated at run time from the heap.
 A pointer to the new RingBuf object called `NAME` is created (`RingBuf *`). On failure (lack of memory), NAME is set to NULL. This would be the equivalent of using `new` in C++.
@@ -74,10 +74,10 @@ A pointer to the new RingBuf object called `NAME` is created (`RingBuf *`). On f
 ### Deconstructor
 
 ```c++
-RINGBUF_DELETE(RingBuf *rb)
+RB_DELETE(RingBuf *rb)
 ```
 
-Deletes the RingBuf, and frees up all the memory associated with it. Only call if the RingBuf was created with `RINGBUF_HEAPALLOC()`
+Deletes the RingBuf, and frees up all the memory associated with it. Only call if the RingBuf was created with `RB_HEAPALLOC()`
 
 ## Methods
 

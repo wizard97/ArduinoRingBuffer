@@ -67,7 +67,7 @@ bool RingBuf_add(RingBuf *self, const void *object)
     // Perform all atomic opertaions
     bool full = self->isFull(self);
 
-    RB_ATOMIC_START
+    ATOMIC()
     {
         //if not full
         if (!full)
@@ -77,7 +77,6 @@ bool RingBuf_add(RingBuf *self, const void *object)
             self->_elements++;
         }
     }
-    RB_ATOMIC_END
 
     return !full;
 }
@@ -87,13 +86,12 @@ void *RingBuf_peek(RingBuf *self, size_t index)
 {
     void *ret = NULL;
     // Perform all atomic opertaions
-    RB_ATOMIC_START
+    ATOMIC()
     {
         //empty or out of bounds
         if (self->isEmpty(self) || index > self->_elements - 1) ret = NULL;
         else ret = &self->_buf[((RingBuf_getTail(self) + index)%self->_maxElements)*self->_size];
     }
-    RB_ATOMIC_END
 
     return ret;
 }
@@ -103,7 +101,7 @@ bool RingBuf_pull(RingBuf *self, void *object)
 {
     bool ret = false;
     // Perform all atomic opertaions
-    RB_ATOMIC_START
+    ATOMIC()
     {
         if (!self->isEmpty(self)) {
             memcpy(object, &self->_buf[RingBuf_getTail(self)*self->_size], self->_size);
@@ -111,7 +109,6 @@ bool RingBuf_pull(RingBuf *self, void *object)
             ret = true;
         }
     }
-    RB_ATOMIC_END
 
     return ret;
 }
@@ -122,11 +119,10 @@ size_t RingBuf_numElements(RingBuf *self)
     size_t elements;
 
     // Perform all atomic opertaions
-    RB_ATOMIC_START
+    ATOMIC()
     {
         elements = self->_elements;
     }
-    RB_ATOMIC_END
 
     return elements;
 }
@@ -137,11 +133,10 @@ bool RingBuf_isFull(RingBuf *self)
     bool ret;
 
     // Perform all atomic opertaions
-    RB_ATOMIC_START
+    ATOMIC()
     {
         ret = self->_elements == self->_maxElements;
     }
-    RB_ATOMIC_END
 
     return ret;
 }
@@ -152,11 +147,10 @@ bool RingBuf_isEmpty(RingBuf *self)
     bool ret;
 
     // Perform all atomic opertaions
-    RB_ATOMIC_START
+    ATOMIC()
     {
         ret = !self->_elements;
     }
-    RB_ATOMIC_END
 
     return ret;
 }
