@@ -8,10 +8,9 @@ I needed a way to buffer sensor events for a group engineering IOT project that 
 I decided to give object oriented programming a shot using only C (no C++) with this library, of course, it still compiles with C++ compilers such as in the Arduino IDE. Using C structs and function pointers, the library creates RingBuf objects that are complete with their own methods and attributes. Note that every method (except constructor), takes a `RingBuf *self` pointer. This is the equivalent of the `this` pointer in C++, but the C++ compiler automatically passes it behind the scenes. For this library, you must manually pass a the `RingBuf *self` pointer as the first argument, like this:
 
 ```c++
-char *mystr = "I like C";
-
-RingBuf *buf = RingBuf_new(sizeof(char*), 100);
-buf->add(buf, &mystr);
+int foo = 1234;
+RingBuf *buf = RingBuf_new(sizeof(int), 20);
+buf->add(buf, &foo);
 ```
 
 ## What about C++ templates?
