@@ -16,7 +16,7 @@ buf->add(buf, &foo);
 ## What about C++ templates?
 
 I recently created a C++ alternative to this library that utilizes the power of C++ templates, now you can perform deep copies of objects.
-Check it out: [C++ alternative library] (https://github.com/wizard97/Embedded_RingBuf_CPP).
+Check it out: [C++ alternative library](https://github.com/wizard97/Embedded_RingBuf_CPP).
 
 ## Use Cases
 
