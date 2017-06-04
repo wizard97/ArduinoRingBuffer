@@ -44,10 +44,16 @@
         #define RB_ATOMIC_START do { uint32_t _savedIS = xt_rsil(15) ;
         #define RB_ATOMIC_END xt_wsr_ps(_savedIS); } while(0);
 
+    #elif defined(__SAM3X8E__)
+        #include <atomic_m3.h>
+        #define RB_ATOMIC_START ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+        #define RB_ATOMIC_END }
+        
+    
     #else
         #define RB_ATOMIC_START {
         #define RB_ATOMIC_END }
-        #warning “This library only fully supports AVR and ESP8266 Boards.”
+        #warning “This library only fully supports AVR, SAM3 and ESP8266 Boards.”
         #warning "Operations on the buffer in ISRs are not safe!"
     #endif
 
