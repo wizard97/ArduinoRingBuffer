@@ -1,4 +1,4 @@
-RingBuf		KEYWORD1
+RingBuf	KEYWORD1
 RingBufC	KEYWORD1
 
 RingBuf_new	KEYWORD2
